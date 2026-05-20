@@ -12,3 +12,114 @@
 2. **Рекурсивный нисходящий предикативный парсер** – разбирает поток токенов согласно грамматике.  
 3. **Семантический анализ** – вычисляет арифметические выражения, проверяет типы переменных, строит таблицу символов.  
 4. **Обработка ошибок** – на уровне лексики, синтаксиса и семантики.
+
+# Используемая грамматика (BNF)
+
+```bnf
+Program         ::= DeclarationList
+
+DeclarationList ::= Declaration DeclarationList | ε
+
+Declaration     ::= Type VarList ";"
+
+Type            ::= "int" | "bool"
+
+VarList         ::= VarInit | VarInit "," VarList
+
+VarInit         ::= ID | ID "=" Expression
+
+Expression      ::= IntExpr | BoolExpr
+
+BoolExpr        ::= "TRUE" | "FALSE"
+
+IntExpr         ::= Term | Term "+" Term | Term "-" Term
+
+Term            ::= Term "*" Factor | Term "/" Factor | Factor
+
+Factor          ::= NUMBER | "(" IntExpr ")"
+```
+
+## Файлы проекта
+
+- `main.py` — основной модуль программы: ввод/вывод, запуск лексера и парсера
+- `lexer.py` — лексический анализатор, преобразует текст в токены
+- `parser.py` — синтаксический анализатор и семантический анализ
+- `README.md` — инструкция по сборке и использованию
+- Входной файл (опционально) с кодом на языке переменных
+
+## Запуск программы
+
+### 1. Из терминала (ввод вручную)
+
+```bash
+python main.py
+```
+
+- `main.py` использует `lexer.py` и `parser.py`, поэтому все модули должны быть в одной папке
+
+Программа попросит ввести код:
+
+```text
+Enter your program: int a = 1 + 2 * 3; bool flag = TRUE; int b, c = 10;
+```
+
+### 2. Из файла
+
+Создайте файл, например `program.txt`, с кодом:
+
+```c
+int a = 1 + 2 * 3; bool flag = TRUE; int b, c = 10;
+```
+
+Запустите:
+
+```bash
+python main.py program.txt
+```
+
+## Вывод программы
+
+Пример вывода для правильного кода:
+
+```text
+Declared a of type int with value 7
+Declared flag of type bool with value True
+Declared b of type int with value None
+Declared c of type int with value 10
+
+Symbol table:
+a: type=int, value=7
+flag: type=bool, value=True
+b: type=int, value=None
+c: type=int, value=10
+```
+
+## Особенности
+
+Сканер преобразует код в токены:
+
+```text
+INT, BOOL, ID, NUMBER, PLUS, STAR и др.
+```
+
+Парсер рекурсивно вызывает функции для каждого нетерминала
+
+Семантика вычисляет арифметические выражения, проверяет типы, строит таблицу символов
+
+Обработка ошибок:
+
+Лексические: неожиданный символ
+
+Синтаксические: неожиданный токен
+
+Семантические: повторное объявление, деление на ноль
+
+## Примечания
+
+Переменные могут быть объявлены без инициализации
+
+Для `int` допускаются арифметические выражения с `+`, `-`, `*`, `/`
+
+Для `bool` только `TRUE` или `FALSE`
+
+Каждое объявление должно заканчиваться `;`
